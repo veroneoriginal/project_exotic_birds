@@ -5,7 +5,6 @@ from models import db
 # берем переменные окружения из файла
 env = dotenv_values(dotenv_path='.env')
 
-
 DB_URI = f'postgresql+psycopg2://{env["POSTGRES_USER"]}:{env["POSTGRES_PASSWORD"]}@{env["POSTGRES_HOST"]}:{env["POSTGRES_PORT"]}/{env["POSTGRES_DB"]}'
 # DB_URI = f'postgresql+psycopg2://{env["POSTGRES_USER"]}:{env["POSTGRES_PASSWORD"]}@pg:5432/shop'
 
@@ -23,10 +22,17 @@ def create_db():
     db.create_all()
     print("Database created successfully.")
 
+
 # Декоратор, указывающий, что функция hello() является callback для корневого URL.
 @app.route("/")
 def index():
+    # return render_template('main_page.html')
     return render_template('main_page.html')
+
+
+@app.route("/registration")
+def registration():
+    return render_template('registration.html')
 
 
 if __name__ == "__main__":
