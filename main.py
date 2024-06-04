@@ -3,8 +3,9 @@ from flask import Flask, render_template
 from models import db
 
 # берем переменные окружения из файла
+# добавляю комментарий
 env = dotenv_values(dotenv_path='.env')
-# print(env)
+print(env)
 
 DB_URI = f'postgresql+psycopg2://{env["POSTGRES_USER"]}:{env["POSTGRES_PASSWORD"]}@{env["DB_HOST"]}:{env["DB_PORT"]}/{env["DB_NAME"]}'
 # DB_URI = f'postgresql+psycopg2://{env["POSTGRES_USER"]}:{env["POSTGRES_PASSWORD"]}@pg:5432/shop'
