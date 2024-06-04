@@ -3,9 +3,8 @@ from flask import Flask, render_template
 from models import db
 
 # берем переменные окружения из файла
-# добавляю комментарий
 env = dotenv_values(dotenv_path='.env')
-print(env)
+
 
 DB_URI = f'postgresql+psycopg2://{env["POSTGRES_USER"]}:{env["POSTGRES_PASSWORD"]}@{env["DB_HOST"]}:{env["DB_PORT"]}/{env["DB_NAME"]}'
 # DB_URI = f'postgresql+psycopg2://{env["POSTGRES_USER"]}:{env["POSTGRES_PASSWORD"]}@pg:5432/shop'
@@ -18,6 +17,11 @@ app.config['SQLALCHEMY_DATABASE_URI'] = DB_URI
 
 db.init_app(app)
 
+
+@app.cli.command("create-db")
+def create_db():
+    db.create_all()
+    print("Database created successfully.")
 
 # Декоратор, указывающий, что функция hello() является callback для корневого URL.
 @app.route("/")
