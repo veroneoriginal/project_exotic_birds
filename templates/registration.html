@@ -43,9 +43,4 @@
 </form>
 
 
-{% if form.is_submitted() %}
-{% for message in get_flashed_messages() %}
-<div style="color: red;">{{ message }}</div>
-{% endfor %}
-{% endif %}
 {% endblock %}

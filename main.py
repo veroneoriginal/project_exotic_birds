@@ -36,7 +36,6 @@ def index():
 
 @app.route("/registration", methods=['GET', 'POST'])
 def registration():
-
     form = RegistrationForm()
 
     if form.validate_on_submit():
@@ -55,7 +54,6 @@ def registration():
 
     # form используется для рендеринга полей формы
     return render_template('registration.html', form=form)
-
 
 
 @app.route("/login", methods=['GET', 'POST'])
