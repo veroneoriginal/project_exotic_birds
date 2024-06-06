@@ -1,0 +1,46 @@
+{% extends "base.html" %}
+
+{% block title %}
+Регистрация
+{% endblock %}
+
+{% block main %}
+<h3>Здесь осуществляется регистрация пользователей</h3>
+<p></p>
+<form action="/registration" method="post">
+    {{ form.hidden_tag() }}
+    <label for="username"> {{ form.username.label}} </label>
+    {{form.username(size=32)}}<br><br>
+
+    <label for="email">{{ form.email.label}} </label>
+    {{form.email(size=32)}}<br><br>
+
+    <label for="password">{{ form.password.label }} </label>
+    {{ form.password(size=32) }}
+    {% if form.password.errors %}
+    <ul>
+        {% for error in form.password.errors %}
+        <li style="color: red;">{{ error }}</li>
+        {% endfor %}
+    </ul>
+    {% endif %}
+    <br><br>
+
+    <label for="confirm_password">{{ form.confirm_password.label }} </label>
+    {{ form.confirm_password(size=32) }}
+    {% if form.confirm_password.errors %}
+    <ul>
+        {% for error in form.confirm_password.errors %}
+        <li style="color: red;">{{ error }}</li>
+        {% endfor %}
+    </ul>
+    {% endif %}
+    <br><br>
+
+
+    <button type="submit">{{form.submit.label}}</button>
+    <a href="/" class="btn btn-secondary">Вернуться на главную</a>
+</form>
+
+
+{% endblock %}

@@ -1,0 +1,16 @@
+{% extends "base.html" %}
+
+{% block title %}
+Статус регистрации
+{% endblock %}
+
+{% block main %}
+
+{% for message in get_flashed_messages() %}
+<div style="color: green;">{{ message }}</div>
+{% endfor %}
+
+
+<h3>Поздравляем! Вы зарегались!</h3>
+<p></p>
+{% endblock %}
