@@ -1,9 +1,12 @@
-from dotenv import dotenv_values
-from flask import Flask, render_template, request, flash, redirect, url_for
-from flask_migrate import Migrate
-from werkzeug.security import generate_password_hash
+from datetime import timedelta
 
-from forms import RegistrationForm
+from dotenv import dotenv_values
+from flask import Flask, render_template, redirect, url_for, flash, session
+from flask_migrate import Migrate
+from werkzeug.security import generate_password_hash, check_password_hash
+from flask_login import LoginManager, UserMixin, login_user, logout_user, login_required, current_user
+
+from forms import RegistrationForm, LoginForm
 from models import db, User
 
 # берем переменные окружения из файла
@@ -20,6 +23,17 @@ app.config['WTF_CSRF_ENABLED'] = True
 
 db.init_app(app)
 migrate = Migrate(app, db)
+
+# Инициализация LoginManager
+login_manager = LoginManager(app)
+login_manager.login_view = 'login'
+
+
+# регистрирует функцию load_user как функцию, кот.будет исп-ся для загрузки user из бд по его id
+@login_manager.user_loader
+def load_user(user_id):
+    """ Функция, которая принимает id user-a и возвращает объект пользователя из базы данных"""
+    return User.query.get(int(user_id))
 
 
 @app.cli.command("create-db")
@@ -48,8 +62,6 @@ def registration():
         db.session.add(new_user)
         db.session.commit()
 
-        # сообщение flash отображается только один раз после следующего запроса
-        flash('Вы успешно зарегистрировались! Теперь можете войти в личный кабинет')
         return redirect(url_for('login'))
 
     # form используется для рендеринга полей формы
@@ -58,7 +70,31 @@ def registration():
 
 @app.route("/login", methods=['GET', 'POST'])
 def login():
-    return render_template('login.html')
+    form = LoginForm()
+    if form.validate_on_submit():
+        user = User.query.filter_by(email=form.email.data).first()
+        if user and check_password_hash(user.password, form.password.data):
+            login_user(user)
+            session.permanent = True  # Делает сессию постоянной
+            flash('Вы успешно вошли в систему!')
+            return redirect(url_for('personal_account'))
+        else:
+            flash('Неправильный email или пароль')
+
+    return render_template('login.html', form=form)
+
+
+@app.route('/logout')
+@login_required
+def logout():
+    logout_user()
+    return redirect(url_for('/'))
+
+
+@app.route('/personal_account')
+@login_required
+def personal_account():
+    return render_template('personal_account.html')
 
 
 if __name__ == "__main__":
