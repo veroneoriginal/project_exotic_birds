@@ -3,6 +3,7 @@ from flask import Flask, render_template, request, flash, redirect, url_for
 from flask_migrate import Migrate
 from werkzeug.security import generate_password_hash
 
+from forms import RegistrationForm
 from models import db, User
 
 # берем переменные окружения из файла
@@ -35,25 +36,27 @@ def index():
 
 @app.route("/registration", methods=['GET', 'POST'])
 def registration():
-    if request.method == 'POST':
-        username = request.form['username']
-        email = request.form['email']
-        password = request.form['password']
-        confirm_password = request.form['confirm_password']
 
-        if password != confirm_password:
-            flash('Пароли не совпадают!')
-            return redirect(url_for('registration'))
+    form = RegistrationForm()
+
+    if form.validate_on_submit():
+        username = form.username.data
+        email = form.email.data
+        password = form.password.data
 
         hashed_password = generate_password_hash(password, method='pbkdf2:sha256')
         new_user = User(username=username, email=email, password=hashed_password)
         db.session.add(new_user)
         db.session.commit()
 
+        # сообщение flash отображается только один раз после следующего запроса
         flash('Вы успешно зарегистрировались! Теперь можете войти в личный кабинет')
-        return redirect(url_for('login'))  # Предполагаем, что у вас есть маршрут для логина
+        return redirect(url_for('login'))
 
-    return render_template('registration.html')
+    # form используется для рендеринга полей формы
+    return render_template('registration.html', form=form)
+
+
 
 @app.route("/login", methods=['GET', 'POST'])
 def login():
