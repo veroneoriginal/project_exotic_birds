@@ -35,7 +35,8 @@ login_manager.init_app(app)
 @login_manager.user_loader
 def load_user(user_id):
     """ Функция, которая принимает id user-a и возвращает объект пользователя из базы данных"""
-    return User.query.get(int(user_id))
+    # return User.query.get(int(user_id))
+    return User.query.filter_by(id=user_id).first()
 
 
 @app.cli.command("create-db")
@@ -44,7 +45,8 @@ def create_db():
     print("Database created successfully.")
 
 
-# Декоратор, указывающий, что функция hello() является callback для корневого URL.
+# Декоратор указывает, что функция index() будет вызываться,
+# когда пользователь обращается к корневому URL ("/") веб-приложения
 @app.route("/")
 def index():
     return render_template('main_page.html')
@@ -63,7 +65,8 @@ def registration():
 
         # выражение справа создает запрос к бд для поиска user-a,
         # у которого username или email совпадает с теми, что были введены в форму
-        existing_user = User.query.filter((User.username == username) | (User.email == email)).first()
+        # existing_user = User.query.filter(User.email == email).first()
+        existing_user = User.query.filter_by(email=email).first()
 
         # вернет объект - <User 3>
         print(existing_user)
@@ -74,7 +77,7 @@ def registration():
         # если все совпадает - если такой пользователь существует
         if existing_user:
 
-            if existing_user.username == username or existing_user.email == email:
+            if existing_user.email == email:
                 form.form_errors.append('Такой пользователь уже есть.')
 
             return render_template('registration.html', form=form)
@@ -115,12 +118,14 @@ def login():
 @app.route('/logout')
 @login_required
 def logout():
+    # logout_user завершает текущую сессию пользователя, удаляя его аутентификационные данные из сеанса
     logout_user()
-    # flash('Вы успешно вышли из системы!', 'success')
     return redirect(url_for('index'))
 
 
 @app.route('/personal_account')
+# Декоратор @login_required разрешает доступ только аутентифицированным пользователям.
+# Если пользователь не аутентифицирован, он будет перенаправлен на страницу входа.
 @login_required
 def personal_account():
     user_posts = Post.query.filter_by(user_id=current_user.id).all()
@@ -132,6 +137,11 @@ def personal_account():
 def create_post():
     form = PostForm()
     if form.validate_on_submit():
+        # Создаем новый объект класса Post с данными, полученными из формы и текущей сессии пользователя
+        # user_id = current_user.id — присваивает id текущего аутентифицированного пользователя
+        # (current_user.id) атрибуту user_id объекта Post
+        # current_user пополняется данными пользователя после успешной аутентификации.
+        # Это происходит благодаря функции login_user(user) из блока login
         post = Post(title=form.title.data, content=form.content.data, user_id=current_user.id)
         db.session.add(post)
         db.session.commit()
@@ -142,7 +152,9 @@ def create_post():
 
 @app.route('/post/<int:post_id>')
 def view_post(post_id):
+    # post_id создается в момент сохранения нового поста в базе данных
     post = Post.query.get_or_404(post_id)
+    # Возвращает отрендеренный HTML-шаблон view_post.html, передавая объект post в контексте
     return render_template('view_post.html', post=post)
 
 
