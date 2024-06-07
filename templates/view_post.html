@@ -1,0 +1,17 @@
+{% extends "base.html" %}
+
+{% block title %}
+{{ post.title }}
+{% endblock %}
+
+{% block main %}
+<br>
+<h1>{{ post.title }}</h1>
+<br>
+<p>{{ post.content }}</p>
+<p>Опубликовано {{ post.date_posted.strftime('%d.%m.%Y %H:%M:%S') }}</p>
+
+<!-- создание ссылки на маршрут личного кабинета -->
+<a href="{{ url_for('personal_account') }}" class="btn btn-outline-primary">Вернуться в личный кабинет</a>
+{% endblock %}
+
