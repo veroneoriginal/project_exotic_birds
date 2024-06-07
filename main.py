@@ -63,7 +63,10 @@ def registration():
         db.session.add(new_user)
         db.session.commit()
 
-        return redirect(url_for('login'))
+        # Автоматически аутентифицируем пользователя
+        login_user(new_user)
+
+        return redirect(url_for('personal_account'))
 
     # form используется для рендеринга полей формы
     return render_template('registration.html', form=form)
