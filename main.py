@@ -26,9 +26,9 @@ db.init_app(app)
 migrate = Migrate(app, db)
 
 # Инициализация LoginManager
-login_manager = LoginManager(app)
-login_manager.login_view = 'login'
-
+login_manager = LoginManager()
+login_manager.login_view = "login"
+login_manager.init_app(app)
 
 # регистрирует функцию load_user как функцию, кот.будет исп-ся для загрузки user из бд по его id
 @login_manager.user_loader
@@ -72,6 +72,7 @@ def registration():
 @app.route("/login", methods=['GET', 'POST'])
 def login():
     form = LoginForm()
+
     if form.validate_on_submit():
         user = User.query.filter_by(email=form.email.data).first()
         if user and check_password_hash(user.password, form.password.data):
