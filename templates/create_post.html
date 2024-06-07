@@ -7,19 +7,13 @@
 {% block main %}
 <br>
 <h1>Страница для создания поста</h1><br>
-
 <form method="POST">
     {{ form.hidden_tag() }}
-
     {{ form.title.label }}
     {{ form.title(class="form-control") }}
-
-
     <br>
     {{ form.content.label }}
     {{ form.content(class="form-control") }}
-
-
     <br>
     <div class="form-group">
         {{ form.submit(class="btn btn-primary") }}

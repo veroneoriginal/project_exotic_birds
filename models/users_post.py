@@ -10,7 +10,5 @@ class Post(db.Model):
     title: Mapped[str] = mapped_column(String, nullable=False)
     content: Mapped[str] = mapped_column(String, nullable=False)
     date_posted: Mapped[datetime] = mapped_column(DateTime, default=datetime.utcnow)
-
     user_id: Mapped[int] = mapped_column(Integer, ForeignKey('users.id'), nullable=False)
-
     user = relationship('User', back_populates='posts')
