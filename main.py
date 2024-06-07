@@ -4,10 +4,10 @@ from dotenv import dotenv_values
 from flask import Flask, render_template, redirect, url_for, flash, session
 from flask_migrate import Migrate
 from werkzeug.security import generate_password_hash, check_password_hash
-from flask_login import LoginManager, login_user, logout_user, login_required
+from flask_login import LoginManager, login_user, logout_user, login_required, current_user
 
-from forms import RegistrationForm, LoginForm
-from models import db, User
+from forms import RegistrationForm, LoginForm, PostForm
+from models import db, User, Post
 
 # берем переменные окружения из файла
 env = dotenv_values(dotenv_path='.env')
@@ -29,6 +29,7 @@ migrate = Migrate(app, db)
 login_manager = LoginManager()
 login_manager.login_view = "login"
 login_manager.init_app(app)
+
 
 # регистрирует функцию load_user как функцию, кот.будет исп-ся для загрузки user из бд по его id
 @login_manager.user_loader
@@ -122,7 +123,27 @@ def logout():
 @app.route('/personal_account')
 @login_required
 def personal_account():
-    return render_template('personal_account.html')
+    user_posts = Post.query.filter_by(user_id=current_user.id).all()
+    return render_template('personal_account.html', posts=user_posts)
+
+
+@app.route('/create_post', methods=['GET', 'POST'])
+@login_required
+def create_post():
+    form = PostForm()
+    if form.validate_on_submit():
+        post = Post(title=form.title.data, content=form.content.data, user_id=current_user.id)
+        db.session.add(post)
+        db.session.commit()
+        flash('Ваш пост создан!', 'success')
+        return redirect(url_for('personal_account'))
+    return render_template('create_post.html', form=form)
+
+
+@app.route('/post/<int:post_id>')
+def view_post(post_id):
+    post = Post.query.get_or_404(post_id)
+    return render_template('view_post.html', post=post)
 
 
 if __name__ == "__main__":
