@@ -9,34 +9,27 @@
 <p></p>
 <form action="/registration" method="post">
     {{ form.hidden_tag() }}
-    <label for="username"> {{ form.username.label}} </label>
+    <label for="username"> {{ form.username.label}} </label><br>
     {{form.username(size=32)}}<br><br>
 
-    <label for="email">{{ form.email.label}} </label>
+    <label for="email">{{ form.email.label}} </label><br>
     {{form.email(size=32)}}<br><br>
 
-    <label for="password">{{ form.password.label }} </label>
-    {{ form.password(size=32) }}
-    {% if form.password.errors %}
-    <ul>
-        {% for error in form.password.errors %}
-        <li style="color: red;">{{ error }}</li>
-        {% endfor %}
-    </ul>
-    {% endif %}
-    <br><br>
+    <label for="password">{{ form.password.label }} </label><br>
+    {{ form.password(size=32) }}<br><br>
 
-    <label for="confirm_password">{{ form.confirm_password.label }} </label>
+    <label for="confirm_password">{{ form.confirm_password.label }} </label><br>
     {{ form.confirm_password(size=32) }}
-    {% if form.confirm_password.errors %}
+
+    <br>
+    {% if form.form_errors %}
     <ul>
-        {% for error in form.confirm_password.errors %}
+        {% for error in form.form_errors %}
         <li style="color: red;">{{ error }}</li>
         {% endfor %}
     </ul>
     {% endif %}
-    <br><br>
-
+    <br>
 
     <button type="submit">{{form.submit.label}}</button>
     <a href="/" class="btn btn-secondary">Вернуться на главную</a>

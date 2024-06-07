@@ -58,6 +58,28 @@ def registration():
         email = form.email.data
         password = form.password.data
 
+        # Проверка уникальности имени пользователя и электронной почты
+
+        # выражение справа создает запрос к бд для поиска user-a,
+        # у которого username или email совпадает с теми, что были введены в форму
+        existing_user = User.query.filter((User.username == username) | (User.email == email)).first()
+
+        # вернет объект - <User 3>
+        print(existing_user)
+
+        # <class 'models.user.User'>
+        print(type(existing_user))
+
+        # если все совпадает - если такой пользователь существует
+        if existing_user:
+
+            if existing_user.username == username or existing_user.email == email:
+                form.form_errors.append('Такой пользователь уже есть.')
+
+            return render_template('registration.html', form=form)
+
+        # Хэширование пароля и создание нового пользователя
+
         hashed_password = generate_password_hash(password, method='pbkdf2:sha256')
         new_user = User(username=username, email=email, password=hashed_password)
         db.session.add(new_user)

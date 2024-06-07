@@ -12,6 +12,7 @@ class RegistrationForm(FlaskForm):
     confirm_password = PasswordField('Повторите пароль', validators=[DataRequired(),
                                     EqualTo('password', message='Пароли не совпадают!')])
     submit = SubmitField('Зарегистрироваться')
+    form_errors = []
 
 
 class LoginForm(FlaskForm):
