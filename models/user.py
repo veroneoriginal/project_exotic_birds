@@ -1,10 +1,11 @@
+from flask_login import UserMixin
 from sqlalchemy.orm import Mapped, mapped_column
 from sqlalchemy import String, DateTime, func
 
 from .database import db
 
 
-class User(db.Model):
+class User(db.Model, UserMixin):
     # Этот класс представляет пользователя моего сайта
     __tablename__ = 'users'
     id: Mapped[int] = mapped_column(primary_key=True)

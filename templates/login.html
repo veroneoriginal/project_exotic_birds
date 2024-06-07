@@ -1,16 +1,52 @@
 {% extends "base.html" %}
 
 {% block title %}
-Статус регистрации
+Авторизация
 {% endblock %}
 
 {% block main %}
+<br>
+<h3>Вход в личный кабинет</h3>
+<br>
 
-{% for message in get_flashed_messages() %}
-<div style="color: green;">{{ message }}</div>
-{% endfor %}
+<form method="POST" action="/login">
+    {{ form.hidden_tag() }}
+    <div>
+        <label for="email">{{ form.email.label }} </label><br>
+        {{ form.email(size=32) }}
+        {% if form.email.errors %}
+        <ul>
+            {% for error in form.email.errors %}
+            <li style="color: red;">{{ error }}</li>
+            {% endfor %}
+        </ul>
+        {% endif %}
+    </div>
+    <br>
+
+    <div>
+        <label for="password">{{ form.password.label }} </label><br>
+        {{ form.password(size=32) }}
+        {% if form.password.errors %}
+        <ul>
+            {% for error in form.password.errors %}
+            <li style="color: red;">{{ error }}</li>
+            {% endfor %}
+        </ul>
+        {% endif %}
+    </div>
 
 
-<h3>Поздравляем! Вы зарегались!</h3>
-<p></p>
+    {% if form.errors.get('general') %}
+    <div style="color: red;">
+        {% for error in form.errors.get('general') %}
+        <span>{{ error }}</span>
+        {% endfor %}
+    </div>
+    {% endif %}
+    <br>
+
+    <button type="submit" class="btn btn-primary">{{ form.submit.label }}</button>
+
+</form>
 {% endblock %}

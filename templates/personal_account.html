@@ -1,0 +1,12 @@
+{% extends "base.html" %}
+
+{% block title %}
+Личный кабинет
+{% endblock %}
+
+{% block main %}
+<h3>Ну вот вы и в личном кабинете, {{ current_user.username }}!</h3>
+<p></p>
+<a href="{{ url_for('logout') }}" class="btn btn-danger">Выйти</a>
+
+{% endblock %}
