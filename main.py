@@ -4,7 +4,7 @@ from dotenv import dotenv_values
 from flask import Flask, render_template, redirect, url_for, flash, session
 from flask_migrate import Migrate
 from werkzeug.security import generate_password_hash, check_password_hash
-from flask_login import LoginManager, UserMixin, login_user, logout_user, login_required, current_user
+from flask_login import LoginManager, login_user, logout_user, login_required
 
 from forms import RegistrationForm, LoginForm
 from models import db, User
@@ -20,6 +20,7 @@ app = Flask(__name__)
 app.config['SQLALCHEMY_DATABASE_URI'] = DB_URI
 app.config['SECRET_KEY'] = env['FLASK_SECRET_KEY']
 app.config['WTF_CSRF_ENABLED'] = True
+app.config['PERMANENT_SESSION_LIFETIME'] = timedelta(days=1)  # Сессия будет истекать через 1 день
 
 db.init_app(app)
 migrate = Migrate(app, db)
@@ -76,10 +77,10 @@ def login():
         if user and check_password_hash(user.password, form.password.data):
             login_user(user)
             session.permanent = True  # Делает сессию постоянной
-            flash('Вы успешно вошли в систему!')
+            flash('Вы успешно вошли в систему!', 'success')
             return redirect(url_for('personal_account'))
         else:
-            flash('Неправильный email или пароль')
+            form.password.errors.append('Неправильный email или пароль')
 
     return render_template('login.html', form=form)
 
@@ -88,7 +89,8 @@ def login():
 @login_required
 def logout():
     logout_user()
-    return redirect(url_for('/'))
+    # flash('Вы успешно вышли из системы!', 'success')
+    return redirect(url_for('index'))
 
 
 @app.route('/personal_account')

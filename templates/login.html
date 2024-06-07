@@ -5,17 +5,14 @@
 {% endblock %}
 
 {% block main %}
-
-<h3>Поздравляем! Вы зарегистрировались!</h3>
-<p></p>
-<h3>Теперь можете войти в систему!</h3>
-<p></p>
-
+<br>
 <h3>Вход в личный кабинет</h3>
+<br>
+
 <form method="POST" action="/login">
     {{ form.hidden_tag() }}
     <div>
-        <label for="email">{{ form.email.label }} </label>
+        <label for="email">{{ form.email.label }} </label><br>
         {{ form.email(size=32) }}
         {% if form.email.errors %}
         <ul>
@@ -25,10 +22,10 @@
         </ul>
         {% endif %}
     </div>
-    <br><br>
+    <br>
 
     <div>
-        <label for="password">{{ form.password.label }} </label>
+        <label for="password">{{ form.password.label }} </label><br>
         {{ form.password(size=32) }}
         {% if form.password.errors %}
         <ul>
@@ -38,13 +35,18 @@
         </ul>
         {% endif %}
     </div>
-    <br><br>
 
-    {% for message in get_flashed_messages() %}
-    <div style="color: red;">{{ message }}</div>
-    {% endfor %}
-    <br><br>
 
-    <button type="submit">{{ form.submit.label }}</button>
+    {% if form.errors.get('general') %}
+    <div style="color: red;">
+        {% for error in form.errors.get('general') %}
+        <span>{{ error }}</span>
+        {% endfor %}
+    </div>
+    {% endif %}
+    <br>
+
+    <button type="submit" class="btn btn-primary">{{ form.submit.label }}</button>
+
 </form>
 {% endblock %}
