@@ -94,7 +94,7 @@ def login():
 
     if form.validate_on_submit():
         user = User.query.filter_by(email=form.email.data).first()
-        if user is not None:
+        if user is None:
             flash("Такого пользователя не существует! Пожалуйста, зарегистрируйтесь!")
             return redirect(url_for('registration'))
         elif user and check_password_hash(user.password, form.password.data):
