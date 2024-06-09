@@ -7,6 +7,7 @@
 {% block main %}
 <h3>Здесь осуществляется регистрация пользователей</h3>
 <p></p>
+
 <form action="/registration" method="post">
     {{ form.hidden_tag() }}
     <label for="username"> {{ form.username.label}} </label><br>
@@ -22,10 +23,12 @@
     {{ form.confirm_password(size=32) }}
 
     <br>
-    {% if form.form_errors %}
+    {% if form.errors %}
     <ul>
-        {% for error in form.form_errors %}
+        {% for field, errors in form.errors.items() %}
+        {% for error in errors %}
         <li style="color: red;">{{ error }}</li>
+        {% endfor %}
         {% endfor %}
     </ul>
     {% endif %}
@@ -34,6 +37,5 @@
     <button type="submit">{{form.submit.label}}</button>
     <a href="/" class="btn btn-secondary">Вернуться на главную</a>
 </form>
-
 
 {% endblock %}

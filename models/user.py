@@ -9,7 +9,7 @@ class User(db.Model, UserMixin):
     __tablename__ = 'users'
     id: Mapped[int] = mapped_column(primary_key=True)
     email: Mapped[str] = mapped_column(String, unique=True, nullable=False)
-    username: Mapped[str] = mapped_column(String, unique=True, nullable=False)
+    username: Mapped[str] = mapped_column(String, unique=False, nullable=False)
     password: Mapped[str] = mapped_column(String, nullable=False)
     date_of_registration: Mapped[DateTime] = mapped_column(DateTime, default=func.now())
 
