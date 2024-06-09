@@ -1,7 +1,7 @@
 from datetime import timedelta
 
 from dotenv import dotenv_values
-from flask import Flask, render_template, redirect, url_for, flash, session
+from flask import Flask, render_template, redirect, url_for, flash, session, abort
 from flask_migrate import Migrate
 from werkzeug.security import generate_password_hash, check_password_hash
 from flask_login import LoginManager, login_user, logout_user, login_required, current_user
@@ -87,10 +87,17 @@ def registration():
 
 @app.route("/login", methods=['GET', 'POST'])
 def login():
+    if current_user.is_authenticated:
+        return redirect(url_for('personal_account'))
+
     form = LoginForm()
+
     if form.validate_on_submit():
         user = User.query.filter_by(email=form.email.data).first()
-        if user and check_password_hash(user.password, form.password.data):
+        if user is None:
+            flash("Такого пользователя не существует! Пожалуйста, зарегистрируйтесь!")
+            return redirect(url_for('registration'))
+        elif user and check_password_hash(user.password, form.password.data):
             login_user(user)
             session.permanent = True  # Делает сессию постоянной
             flash('Вы успешно вошли в систему!', 'success')
@@ -142,6 +149,24 @@ def view_post(post_id):
     post = Post.query.get_or_404(post_id)
     # Возвращает отрендеренный HTML-шаблон view_post.html, передавая объект post в контексте
     return render_template('view_post.html', post=post)
+
+
+@app.route("/post/<int:post_id>/publish", methods=['POST'])
+@login_required
+def publish_post(post_id):
+    post = Post.query.get_or_404(post_id)
+    if post.user != current_user:
+        abort(403)
+    post.is_published = True
+    db.session.commit()
+    flash('Ваш пост опубликован!', 'success')
+    return redirect(url_for('blog'))
+
+
+@app.route('/blog')
+def blog():
+    posts = Post.query.filter_by(is_published=True).all()
+    return render_template('blog.html', posts=posts)
 
 
 if __name__ == "__main__":

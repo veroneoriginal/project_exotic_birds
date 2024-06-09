@@ -19,6 +19,13 @@
                 <h5 class="card-title">{{ post.title }}</h5>
                 <p class="card-text">{{ post.content[:100] }}...</p>
                 <a href="{{ url_for('view_post', post_id=post.id) }}" class="btn btn-success">Посмотреть пост</a>
+                {% if not post.is_published %}
+                <form action="{{ url_for('publish_post', post_id=post.id) }}" method="POST" style="display:inline;">
+                    <button type="submit" class="btn btn-outline-primary">Опубликовать пост</button>
+                </form>
+                {% else %}
+                <span class="badge bg-warning text-dark position-absolute top-0 end-0 m-2">Опубликовано</span>
+                {% endif %}
             </div>
         </div>
     </div>
