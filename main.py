@@ -144,5 +144,10 @@ def view_post(post_id):
     return render_template('view_post.html', post=post)
 
 
+@app.route('/blog')
+def blog():
+    return render_template('blog.html')
+
+
 if __name__ == "__main__":
     app.run(debug=True)
