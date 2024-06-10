@@ -151,11 +151,10 @@ def view_post(post_id):
     # Проверка, опубликован ли пост и имеет ли пользователь доступ к нему
     if not post.is_published:
         if not current_user.is_authenticated:
-            flash('Этот пост недоступен для просмотра, так как он еще не опубликован. Пожалуйста, аутентифицируйтесь.',
-                  'warning')
-            return redirect(url_for('login'))
+            flash('Этого поста не существует.','warning')
+            return redirect(url_for('blog'))
         elif post.user_id != current_user.id:
-            flash('Этот пост недоступен для просмотра, так как он еще не опубликован.', 'warning')
+            flash('Этого поста не существует.','warning')
             return redirect(url_for('personal_account'))
 
     # Возвращает отрендеренный HTML-шаблон view_post.html, передавая объект post в контексте
