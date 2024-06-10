@@ -113,6 +113,7 @@ def login():
 def logout():
     # logout_user завершает текущую сессию пользователя, удаляя его аутентификационные данные из сеанса
     logout_user()
+    flash('Вы успешно вышли из системы.', 'success')
     return redirect(url_for('index'))
 
 
