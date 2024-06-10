@@ -147,6 +147,16 @@ def create_post():
 def view_post(post_id):
     # post_id создается в момент сохранения нового поста в базе данных
     post = Post.query.get_or_404(post_id)
+
+    # Проверка, опубликован ли пост и имеет ли пользователь доступ к нему
+    if not post.is_published:
+        if not current_user.is_authenticated:
+            flash('Этого поста не существует.','warning')
+            return redirect(url_for('blog'))
+        elif post.user_id != current_user.id:
+            flash('Этого поста не существует.','warning')
+            return redirect(url_for('personal_account'))
+
     # Возвращает отрендеренный HTML-шаблон view_post.html, передавая объект post в контексте
     return render_template('view_post.html', post=post)
 
