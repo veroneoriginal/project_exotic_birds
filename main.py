@@ -151,10 +151,10 @@ def view_post(post_id):
     # Проверка, опубликован ли пост и имеет ли пользователь доступ к нему
     if not post.is_published:
         if not current_user.is_authenticated:
-            flash('Этого поста не существует.','warning')
+            flash('Этого поста не существует.', 'warning')
             return redirect(url_for('blog'))
         elif post.user_id != current_user.id:
-            flash('Этого поста не существует.','warning')
+            flash('Этого поста не существует.', 'warning')
             return redirect(url_for('personal_account'))
 
     # Возвращает отрендеренный HTML-шаблон view_post.html, передавая объект post в контексте
@@ -173,11 +173,25 @@ def publish_post(post_id):
     return redirect(url_for('blog'))
 
 
+@app.route('/delete_post/<int:post_id>', methods=['POST'])
+@login_required
+def delete_post(post_id):
+    post = Post.query.get_or_404(post_id)
+
+    if post.user_id != current_user.id:
+        flash('Вы не имеете прав на удаление этого поста.', 'danger')
+        return redirect(url_for('personal_account'))
+
+    db.session.delete(post)
+    db.session.commit()
+    flash('Пост был успешно удален.', 'success')
+    return redirect(url_for('personal_account'))
+
+
 @app.route('/blog')
 def blog():
     posts = Post.query.filter_by(is_published=True).all()
     return render_template('blog.html', posts=posts)
-
 
 if __name__ == "__main__":
     app.run(debug=True)
