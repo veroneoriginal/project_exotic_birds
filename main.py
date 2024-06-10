@@ -177,6 +177,11 @@ def publish_post(post_id):
 @login_required
 def delete_post(post_id):
     post = Post.query.get_or_404(post_id)
+
+    if post.user_id != current_user.id:
+        flash('Вы не имеете прав на удаление этого поста.', 'danger')
+        return redirect(url_for('personal_account'))
+
     db.session.delete(post)
     db.session.commit()
     flash('Пост был успешно удален.', 'success')
