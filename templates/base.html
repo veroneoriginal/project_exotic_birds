@@ -29,6 +29,11 @@
             <div class="text-end">
                 {% if current_user.is_authenticated %}
                 <span class="text-white me-2">Аккаунт, {{ current_user.username }}</span>
+
+                <!--Эта строка проверяет, находится ли текущий путь (URL) не на странице личного кабинета-->
+                {% if request.path != url_for('personal_account') %}
+                <a href="{{ url_for('personal_account') }}" class="btn btn-outline-warning">Личный кабинет</a>
+                {% endif %}
                 <a href="{{ url_for('logout') }}" class="btn btn-warning">Выйти</a>
                 {% else %}
                 <a href="{{ url_for('login') }}" class="btn btn-outline-light me-2">Войти в личный кабинет</a>
