@@ -1,13 +1,12 @@
 from datetime import timedelta
-
 from dotenv import dotenv_values
 from flask import Flask, render_template, redirect, url_for, flash, session, abort, request
 from flask_migrate import Migrate
 from werkzeug.security import generate_password_hash, check_password_hash
 from flask_login import LoginManager, login_user, logout_user, login_required, current_user
-
 from forms import RegistrationForm, LoginForm, PostForm
 from models import db, User, Post
+from faker import Faker
 
 # берем переменные окружения из файла
 env = dotenv_values(dotenv_path='.env')
@@ -43,6 +42,38 @@ def load_user(user_id):
 def create_db():
     db.create_all()
     print("Database created successfully.")
+
+
+def generate_fake_data(num_users=5, max_posts_per_user=5):
+    """Функция для генерации фейковых данных"""
+    fake = Faker('ru_RU')
+    for _ in range(num_users):
+        user = User(
+            email=fake.email(),
+            username=fake.user_name(),
+            password=fake.password()
+        )
+        # Сохраняем пользователя, чтобы получить user.id
+        db.session.add(user)
+        db.session.commit()
+
+        num_posts = fake.random_int(min=1, max=max_posts_per_user)
+        for _ in range(num_posts):
+            post = Post(
+                title=fake.sentence(),
+                content=fake.text(),
+                is_published=fake.boolean(chance_of_getting_true=50),
+                user_id=user.id
+            )
+            db.session.add(post)
+    db.session.commit()
+
+
+def is_database_empty():
+    """ Функция проверки наличия записей в базе данных"""
+    user_count = User.query.count()
+    post_count = Post.query.count()
+    return user_count == 0 and post_count == 0
 
 
 # Декоратор указывает, что функция index() будет вызываться,
@@ -211,13 +242,14 @@ def edit_post(post_id):
     return render_template('edit_post.html', post=post)
 
 
-
 @app.route('/blog')
 def blog():
     posts = Post.query.filter_by(is_published=True).all()
-    if not posts:
-        flash('Пока в этом блоге ничего не опубликовано', 'info')
     return render_template('blog.html', posts=posts)
 
+
 if __name__ == "__main__":
+    with app.app_context():
+        if is_database_empty():
+            generate_fake_data()
     app.run(debug=True)
