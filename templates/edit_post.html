@@ -1,0 +1,23 @@
+{% extends "base.html" %}
+
+{% block title %}
+Редактировать пост
+{% endblock %}
+
+{% block main %}
+<div class="container mt-4">
+    <h1>Редактировать пост</h1>
+    <form method="POST">
+        <div class="mb-3">
+            <label for="title" class="form-label">Заголовок</label>
+            <input type="text" class="form-control" id="title" name="title" value="{{ post.title }}" required>
+        </div>
+        <div class="mb-3">
+            <label for="content" class="form-label">Содержание</label>
+            <textarea class="form-control" id="content" name="content" rows="10" required>{{ post.content }}</textarea>
+        </div>
+        <button type="submit" class="btn btn-primary">Обновить пост</button>
+        <a href="{{ url_for('view_post', post_id=post.id) }}" class="btn btn-secondary">Отмена</a>
+    </form>
+</div>
+{% endblock %}
