@@ -51,7 +51,7 @@ def generate_fake_data(num_users=5, max_posts_per_user=5):
         user = User(
             email=fake.email(),
             username=fake.user_name(),
-            password=fake.password()
+            password=generate_password_hash(fake.password())
         )
         # Сохраняем пользователя, чтобы получить user.id
         db.session.add(user)
