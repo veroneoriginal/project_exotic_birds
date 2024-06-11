@@ -1,7 +1,7 @@
 from datetime import timedelta
 
 from dotenv import dotenv_values
-from flask import Flask, render_template, redirect, url_for, flash, session, abort
+from flask import Flask, render_template, redirect, url_for, flash, session, abort, request
 from flask_migrate import Migrate
 from werkzeug.security import generate_password_hash, check_password_hash
 from flask_login import LoginManager, login_user, logout_user, login_required, current_user
@@ -190,6 +190,26 @@ def delete_post(post_id):
     db.session.commit()
     flash('Пост был успешно удален.', 'success')
     return redirect(url_for('personal_account'))
+
+
+@app.route('/edit_post/<int:post_id>', methods=['GET', 'POST'])
+@login_required
+def edit_post(post_id):
+    post = Post.query.get_or_404(post_id)
+
+    if post.user_id != current_user.id:
+        flash('Вы не имеете прав на редактирование этого поста.', 'danger')
+        return redirect(url_for('view_post', post_id=post.id))
+
+    if request.method == 'POST':
+        post.title = request.form['title']
+        post.content = request.form['content']
+        db.session.commit()
+        flash('Пост был успешно обновлен.', 'success')
+        return redirect(url_for('view_post', post_id=post.id))
+
+    return render_template('edit_post.html', post=post)
+
 
 
 @app.route('/blog')
