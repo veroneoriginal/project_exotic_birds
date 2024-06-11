@@ -158,8 +158,11 @@ def view_post(post_id):
             flash('Этого поста не существует.', 'warning')
             return redirect(url_for('personal_account'))
 
+    # Определение, является ли текущий пользователь автором поста
+    is_author = current_user.is_authenticated and post.user_id == current_user.id
+
     # Возвращает отрендеренный HTML-шаблон view_post.html, передавая объект post в контексте
-    return render_template('view_post.html', post=post)
+    return render_template('view_post.html', post=post, is_author=is_author)
 
 
 @app.route("/post/<int:post_id>/publish", methods=['POST'])
