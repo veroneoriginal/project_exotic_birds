@@ -70,11 +70,14 @@ def generate_fake_data(num_users=5, max_posts_per_user=5):
     db.session.commit()
 
 
-def is_database_empty():
-    """ Функция проверки наличия записей в базе данных"""
-    user_count = User.query.count()
-    post_count = Post.query.count()
-    return user_count == 0 and post_count == 0
+def initialize_database():
+    """Функция, с помощью которой проверяем состояние базы данных"""
+    with app.app_context():
+        user_count = User.query.count()
+        post_count = Post.query.count()
+        # проверяем наличие записей в базе данных
+        if user_count == 0 and post_count == 0:
+            generate_fake_data()
 
 
 # Декоратор указывает, что функция index() будет вызываться,
@@ -250,7 +253,5 @@ def blog():
 
 
 if __name__ == "__main__":
-    with app.app_context():
-        if is_database_empty():
-            generate_fake_data()
+    initialize_database()
     app.run(debug=True)
