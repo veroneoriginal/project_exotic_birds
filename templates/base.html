@@ -21,10 +21,19 @@
             </a>
 
             <ul class="nav col-12 col-lg-auto me-lg-auto mb-2 justify-content-center mb-md-0">
-                <li><a href="/" class="nav-link px-2 text-secondary">Главная</a></li>
+                <li><a href="/" class="nav-link px-2 text-white">Главная</a></li>
                 <li><a href="/blog" class="nav-link px-2 text-white">Блог</a></li>
             </ul>
 
+            <!-- Блок аутентификации -->
+            <div class="text-end">
+                {% if current_user.is_authenticated %}
+                <span class="text-white me-2">Аккаунт, {{ current_user.username }}</span>
+                <a href="{{ url_for('logout') }}" class="btn btn-warning">Выйти</a>
+                {% else %}
+                <a href="{{ url_for('login') }}" class="btn btn-outline-light me-2">Войти в личный кабинет</a>
+                {% endif %}
+            </div>
         </div>
     </div>
 </header>
