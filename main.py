@@ -215,6 +215,8 @@ def edit_post(post_id):
 @app.route('/blog')
 def blog():
     posts = Post.query.filter_by(is_published=True).all()
+    if not posts:
+        flash('Пока в этом блоге ничего не опубликовано', 'info')
     return render_template('blog.html', posts=posts)
 
 if __name__ == "__main__":

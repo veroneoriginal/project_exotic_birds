@@ -11,6 +11,7 @@
 <h3>Изучите удивительные особенности, поведение и уникальные адаптации, которые позволяют
     этим ярким существам процветать в самых разных уголках нашей планеты.</h3>
 <br>
+{% if posts %}
 <div class="row">
     {% for post in posts %}
     {% if post.is_published %}
@@ -29,5 +30,8 @@
     {% endif %}
     {% endfor %}
 </div>
+{% else %}
+<div class="alert alert-info">Пока в этом блоге ничего не опубликовано.</div>
+{% endif %}
 <a href="/" class="btn btn-secondary">Вернуться на главную</a>
 {% endblock %}
