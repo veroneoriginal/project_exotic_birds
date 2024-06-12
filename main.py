@@ -249,18 +249,33 @@ def delete_post(post_id):
 def edit_post(post_id):
     post = Post.query.get_or_404(post_id)
 
+    # Проверка, что текущий пользователь является автором поста
     if post.user_id != current_user.id:
-        flash('Вы не имеете прав на редактирование этого поста.', 'danger')
-        return redirect(url_for('view_post', post_id=post.id))
+        flash('Вы не можете редактировать этот пост.', 'danger')
+        return redirect(url_for('blog'))
 
-    if request.method == 'POST':
-        post.title = request.form['title']
-        post.content = request.form['content']
+    form = PostForm(obj=post)
+
+    # Установим текущие теги для поста
+    if request.method == 'GET':
+        form.tags.data = [tag.id for tag in post.tags]
+
+    if form.validate_on_submit():
+        post.title = form.title.data
+        post.content = form.content.data
+
+        # Обновление тегов
+        post.tags = []
+        selected_tags = form.tags.data
+        for tag_id in selected_tags:
+            tag = Tag.query.get(tag_id)
+            post.tags.append(tag)
+
         db.session.commit()
-        flash('Пост был успешно обновлен.', 'success')
+        flash('Ваш пост обновлен!', 'success')
         return redirect(url_for('view_post', post_id=post.id))
 
-    return render_template('edit_post.html', post=post)
+    return render_template('edit_post.html', form=form, post=post)
 
 
 @app.route('/blog')

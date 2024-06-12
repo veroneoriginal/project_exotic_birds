@@ -10,11 +10,24 @@
 <a href="{{ url_for('create_post') }}" class="btn btn-primary">Создать новый пост</a><br>
 <br>
 <h2>Ваши посты</h2>
+<!-- row и col-md-4 используется для создания сетки -->
 <div class="row">
     {% for post in posts %}
     <div class="col-md-4">
-        <div class="card mb-4 shadow-sm position-relative">
-            <div class="card-body">
+        <div class="card mb-4 shadow-sm">
+            <div class="card-body position-relative">
+                <div class="d-flex justify-content-between align-items-start">
+                    <div>
+                        {% if post.tags %}
+                        {% for tag in post.tags %}
+                        <span class="badge bg-info m-1">{{ tag.name }}</span>
+                        {% endfor %}
+                        {% endif %}
+                    </div>
+                    {% if post.is_published %}
+                    <span class="badge bg-warning text-dark">Опубликовано</span>
+                    {% endif %}
+                </div>
                 <h5 class="card-title">{{ post.title }}</h5>
                 <p class="card-text">{{ post.content[:100] }}...</p>
                 <a href="{{ url_for('view_post', post_id=post.id) }}" class="btn btn-success">Посмотреть пост</a>
@@ -26,9 +39,6 @@
                 <form action="{{ url_for('delete_post', post_id=post.id) }}" method="POST" style="display:inline;">
                     <button type="submit" class="btn btn-danger">Удалить пост</button>
                 </form>
-                {% if post.is_published %}
-                <span class="badge bg-warning text-dark position-absolute top-0 end-0 m-2">Опубликовано</span>
-                {% endif %}
             </div>
         </div>
     </div>
