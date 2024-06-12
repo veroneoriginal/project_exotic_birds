@@ -5,7 +5,7 @@ from flask_migrate import Migrate
 from werkzeug.security import generate_password_hash, check_password_hash
 from flask_login import LoginManager, login_user, logout_user, login_required, current_user
 from forms import RegistrationForm, LoginForm, PostForm
-from models import db, User, Post
+from models import db, User, Post, Tag
 from faker import Faker
 
 # берем переменные окружения из файла
@@ -162,12 +162,14 @@ def personal_account():
 def create_post():
     form = PostForm()
     if form.validate_on_submit():
-        # Создаем новый объект класса Post с данными, полученными из формы и текущей сессии пользователя
-        # user_id = current_user.id — присваивает id текущего аутентифицированного пользователя
-        # (current_user.id) атрибуту user_id объекта Post
-        # current_user пополняется данными пользователя после успешной аутентификации.
-        # Это происходит благодаря функции login_user(user) из блока login
         post = Post(title=form.title.data, content=form.content.data, user_id=current_user.id)
+        selected_tags = form.tags.data
+        for tag_name in selected_tags:
+            tag = Tag.query.filter_by(name=tag_name).first()
+            if not tag:
+                tag = Tag(name=tag_name)
+                db.session.add(tag)
+            post.tags.append(tag)
         db.session.add(post)
         db.session.commit()
         flash('Ваш пост создан!', 'success')

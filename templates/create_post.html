@@ -7,7 +7,7 @@
 {% block main %}
 <br>
 <h1>Страница для создания поста</h1><br>
-<form method="POST">
+<form method="POST" action="{{ url_for('create_post') }}">
     {{ form.hidden_tag() }}
     {{ form.title.label }}
     {{ form.title(class="form-control") }}
@@ -15,8 +15,9 @@
     {{ form.content.label }}
     {{ form.content(class="form-control") }}
     <br>
-    <div class="form-group">
-        {{ form.submit(class="btn btn-primary") }}
-    </div>
+    {{ form.tags.label}}
+    {{ form.tags(class="form-control") }}
+    <br>
+    {{ form.submit(class="btn btn-primary") }}
 </form>
 {% endblock %}
