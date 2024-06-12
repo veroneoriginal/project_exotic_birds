@@ -265,11 +265,14 @@ def edit_post(post_id):
         post.content = form.content.data
 
         # Обновление тегов
-        post.tags = []
-        selected_tags = form.tags.data
-        for tag_id in selected_tags:
-            tag = Tag.query.get(tag_id)
-            post.tags.append(tag)
+        if form.remove_all_tags.data:
+            post.tags = []
+        else:
+            post.tags = []
+            selected_tags = form.tags.data
+            for tag_id in selected_tags:
+                tag = Tag.query.get(tag_id)
+                post.tags.append(tag)
 
         db.session.commit()
         flash('Ваш пост обновлен!', 'success')
@@ -280,8 +283,20 @@ def edit_post(post_id):
 
 @app.route('/blog')
 def blog():
-    posts = Post.query.filter_by(is_published=True).all()
+    # Извлечение значения параметра tag/user из строки запроса URL (если он существует).
+    tag_id = request.args.get('tag')
+    user_id = request.args.get('user')
+
+    if tag_id:
+        posts = Post.query.filter(Post.tags.any(id=tag_id), Post.is_published).all()
+    elif user_id:
+        posts = Post.query.filter_by(user_id=user_id, is_published=True).all()
+    else:
+        posts = Post.query.filter_by(is_published=True).all()
+
     return render_template('blog.html', posts=posts)
+
+
 
 
 if __name__ == "__main__":

@@ -8,9 +8,16 @@
 <br>
 <h3>Блог об экзотических птицах, их видовом разнообразии и жизни в естественной среде</h3>
 <br>
-<h2>Изучите удивительные особенности, поведение и уникальные адаптации, которые позволяют
-    этим ярким существам процветать в самых разных уголках нашей планеты.</h2>
+<h3>Изучите удивительные особенности, поведение и уникальные адаптации, которые позволяют
+    этим ярким существам процветать в самых разных уголках нашей планеты.</h3>
 <br>
+
+
+<!-- Ссылка для снятия фильтра, видна только когда активен фильтр -->
+{% if request.args.get('tag') or request.args.get('user') %}
+<a href="{{ url_for('blog') }}" class="btn btn-primary mb-4">Снять фильтр</a>
+{% endif %}
+
 {% if posts %}
 <div class="row">
     {% for post in posts %}
@@ -18,15 +25,19 @@
     <div class="col-md-4">
         <div class="card mb-4 shadow-sm">
             <div class="card-body position-relative">
-                <div class="d-flex justify-content-between align-items-center">
-                    <span class="badge bg-warning">{{ post.user.username }}</span>
+                <div class="d-flex justify-content-between align-items-start">
                     <div>
+                        {% if post.tags %}
                         {% for tag in post.tags %}
-                        <span class="badge bg-info">{{ tag.name }}</span>
+<!--                        Ссылка на фильтрацию по тегам-->
+                        <a href="{{ url_for('blog', tag=tag.id) }}" class="badge bg-info m-1">{{ tag.name }}</a>
                         {% endfor %}
+                        {% endif %}
                     </div>
+<!--                    Ссылка на фильтрацию по пользователю:-->
+                    <a href="{{ url_for('blog', user=post.user.id) }}" class="badge bg-warning text-dark m-1">{{ post.user.username }}</a>
                 </div>
-                <h5 class="card-title mt-3">{{ post.title }}</h5>
+                <h5 class="card-title">{{ post.title }}</h5>
                 <p class="card-text">{{ post.content[:100] }}...</p>
                 <a href="{{ url_for('view_post', post_id=post.id) }}" class="btn btn-success">Читать далее</a>
             </div>
@@ -39,5 +50,4 @@
 <div class="alert alert-info">Пока в этом блоге ничего не опубликовано.</div>
 {% endif %}
 <a href="/" class="btn btn-secondary">Вернуться на главную</a>
-
 {% endblock %}
