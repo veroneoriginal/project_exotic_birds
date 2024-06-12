@@ -1,5 +1,5 @@
 from flask_wtf import FlaskForm
-from wtforms import StringField, TextAreaField, SelectMultipleField
+from wtforms import StringField, TextAreaField, SelectMultipleField, BooleanField
 from wtforms.fields.simple import SubmitField, PasswordField
 from wtforms.validators import DataRequired, Email, EqualTo, Length
 from models import Tag
@@ -32,6 +32,7 @@ class PostForm(FlaskForm):
     # coerce=int: значения, выбранные пользователем, должны быть приведены к int.
     # Значения тегов будут ID тегов из базы данных, которые являются целыми числами.
     tags = SelectMultipleField('Tags', coerce=int)
+    remove_all_tags = BooleanField('Удалить теги')
     submit = SubmitField('Создать пост')
 
     def __init__(self, *args, **kwargs):

@@ -21,6 +21,10 @@
             {{ form.tags.label(class="form-label") }}
             {{ form.tags(class="form-control", id="tags") }}
         </div>
+        <div class="mb-3">
+            {{ form.remove_all_tags.label(class="form-check-label") }}
+            {{ form.remove_all_tags(class="form-check-input", id="remove_all_tags") }}
+        </div>
         <button type="submit" class="btn btn-primary">Обновить пост</button>
         <a href="{{ url_for('view_post', post_id=post.id) }}" class="btn btn-secondary">Отмена</a>
     </form>

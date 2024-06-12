@@ -265,11 +265,14 @@ def edit_post(post_id):
         post.content = form.content.data
 
         # Обновление тегов
-        post.tags = []
-        selected_tags = form.tags.data
-        for tag_id in selected_tags:
-            tag = Tag.query.get(tag_id)
-            post.tags.append(tag)
+        if form.remove_all_tags.data:
+            post.tags = []
+        else:
+            post.tags = []
+            selected_tags = form.tags.data
+            for tag_id in selected_tags:
+                tag = Tag.query.get(tag_id)
+                post.tags.append(tag)
 
         db.session.commit()
         flash('Ваш пост обновлен!', 'success')
