@@ -75,6 +75,15 @@ def initialize_database(num_users=5, max_posts_per_user=6):
                     db.session.add(post)
             db.session.commit()
 
+        # Наполнение базы данных тегами
+        # Выполняется внутри контекста, чтобы Flask знал, какое приложение будет использоваться
+        tags = ['Природа', 'Птицы', 'Животные']
+        for tag_name in tags:
+            if not Tag.query.filter_by(name=tag_name).first():
+                tag = Tag(name=tag_name)
+                db.session.add(tag)
+        db.session.commit()
+
 
 # Декоратор указывает, что функция index() будет вызываться,
 # когда пользователь обращается к корневому URL ("/") веб-приложения
@@ -158,18 +167,28 @@ def personal_account():
 
 
 @app.route('/create_post', methods=['GET', 'POST'])
+# Декоратор требует, чтобы пользователь был аутентифицирован для доступа к этой функции
 @login_required
 def create_post():
     form = PostForm()
     if form.validate_on_submit():
+
+        # Создание нового поста с данными из формы
         post = Post(title=form.title.data, content=form.content.data, user_id=current_user.id)
+
+        # Получение выбранных тегов из формы
+        # Обращение к полю формы tags. Это поле определено в PostForm
+        # Атрибут data содержит значения, которые пользователь выбрал в этом поле формы после отправки формы
         selected_tags = form.tags.data
-        for tag_name in selected_tags:
-            tag = Tag.query.filter_by(name=tag_name).first()
-            if not tag:
-                tag = Tag(name=tag_name)
-                db.session.add(tag)
+
+        # Присваивание тегов посту
+        for tag_id in selected_tags:
+            # Получение объекта тега по его ID
+            tag = Tag.query.get(tag_id)
+            # Связывание тега с постом
             post.tags.append(tag)
+
+        # Сохранение поста в базе данных
         db.session.add(post)
         db.session.commit()
         flash('Ваш пост создан!', 'success')

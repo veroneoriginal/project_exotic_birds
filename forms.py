@@ -2,6 +2,7 @@ from flask_wtf import FlaskForm
 from wtforms import StringField, TextAreaField, SelectMultipleField
 from wtforms.fields.simple import SubmitField, PasswordField
 from wtforms.validators import DataRequired, Email, EqualTo, Length
+from models import Tag
 
 
 class RegistrationForm(FlaskForm):
@@ -27,5 +28,13 @@ class PostForm(FlaskForm):
     """Форма для создания поста"""
     title = StringField('Title', validators=[DataRequired(), Length(max=150)])
     content = TextAreaField('Content', validators=[DataRequired()])
-    tags = SelectMultipleField('Tags', choices=[('nature', 'Природа'), ('birds', 'Птицы'), ('animals', 'Животные')])
+    # SelectMultipleField - позволяет пользователю выбирать несколько значений из выпадающего списка
+    # coerce=int: значения, выбранные пользователем, должны быть приведены к int.
+    # Значения тегов будут ID тегов из базы данных, которые являются целыми числами.
+    tags = SelectMultipleField('Tags', coerce=int)
     submit = SubmitField('Создать пост')
+
+    def __init__(self, *args, **kwargs):
+        super(PostForm, self).__init__(*args, **kwargs)
+        # Заполнение поля tags списком тегов из базы данных
+        self.tags.choices = [(tag.id, tag.name) for tag in Tag.query.all()]
