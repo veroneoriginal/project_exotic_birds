@@ -17,10 +17,19 @@
         border-color: darkorange;
     }
 </style>
+
 <br>
+<!-- Отображение тегов -->
+{% if post.tags %}
+<div class="mt-2">
+    {% for tag in post.tags %}
+    <span class="badge bg-info">{{ tag.name }}</span>
+    {% endfor %}
+</div>
+{% endif %}
+
 <div class="container mt-4">
-    <h1>{{ post.title }}</h1>
-    <br>
+    <h3>{{ post.title }}</h3>
     <p>{{ post.content }}</p>
     <p>Опубликовано {{ post.date_posted.strftime('%d.%m.%Y %H:%M:%S') }}</p>
 
