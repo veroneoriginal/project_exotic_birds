@@ -28,3 +28,9 @@ class Tag(db.Model):
     id: Mapped[int] = mapped_column(Integer, primary_key=True)
     name: Mapped[str] = mapped_column(String, unique=True, nullable=False)
     posts = relationship('Post', secondary='post_tags', back_populates='tags')
+
+    def __str__(self):
+        return self.name
+
+    def __repr__(self):
+        return self.name

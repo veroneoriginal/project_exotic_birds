@@ -11,7 +11,9 @@ def initialize_database(num_users=5, max_posts_per_user=6):
     # проверяем наличие записей в базе данных
     # если бд пустая, генерим данные
     if user_count == 0 and post_count == 0:
+        Faker.seed(42)
         fake = Faker('ru_RU')
+
         for _ in range(num_users):
             user = User(
                 email=fake.email(),
@@ -39,11 +41,6 @@ def initialize_database(num_users=5, max_posts_per_user=6):
         tags = [fake.unique.word() for _ in range(7)]
         tag_objects = [Tag(name=tag_name) for tag_name in tags]
 
-        # Добавление тегов в сессию и коммит в базу данных
-        # bulk_save_objects в SQLAlchemy позволяет быстро сохранять множество объектов в бд в 1 запрос
-        db.session.bulk_save_objects(tag_objects)
-        db.session.commit()
-
         # Назначение тегов постам
         posts = Post.query.all()
         for post in posts:
@@ -51,4 +48,5 @@ def initialize_database(num_users=5, max_posts_per_user=6):
             random_tags = fake.random_elements(elements=tag_objects, length=num_tags, unique=True)
             for tag in random_tags:
                 post.tags.append(tag)
+
         db.session.commit()
