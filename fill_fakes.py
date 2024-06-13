@@ -36,14 +36,12 @@ def initialize_database(num_users=5, max_posts_per_user=6):
 
         # Наполнение базы данных тегами
         # Выполняется внутри контекста, чтобы Flask знал, какое приложение будет использоваться
-        tags = fake.words(nb=7)
-        tag_objects = []
-        for tag_name in tags:
-            tag = Tag.query.filter_by(name=tag_name).first()
-            if not tag:
-                tag = Tag(name=tag_name)
-                db.session.add(tag)
-            tag_objects.append(tag)
+        tags = [fake.unique.word() for _ in range(7)]
+        tag_objects = [Tag(name=tag_name) for tag_name in tags]
+
+        # Добавление тегов в сессию и коммит в базу данных
+        # bulk_save_objects в SQLAlchemy позволяет быстро сохранять множество объектов в бд в 1 запрос
+        db.session.bulk_save_objects(tag_objects)
         db.session.commit()
 
         # Назначение тегов постам
