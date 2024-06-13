@@ -8,6 +8,7 @@ from forms import RegistrationForm, LoginForm, PostForm
 from models import db, User, Post, Tag
 from faker import Faker
 
+
 # берем переменные окружения из файла
 env = dotenv_values(dotenv_path='.env')
 
@@ -28,20 +29,6 @@ migrate = Migrate(app, db)
 login_manager = LoginManager()
 login_manager.login_view = "login"
 login_manager.init_app(app)
-
-
-# регистрирует функцию load_user как функцию, кот.будет исп-ся для загрузки user из бд по его id
-@login_manager.user_loader
-def load_user(user_id):
-    """ Функция, которая принимает id user-a и возвращает объект пользователя из базы данных"""
-    # return User.query.get(int(user_id))
-    return User.query.filter_by(id=user_id).first()
-
-
-@app.cli.command("create-db")
-def create_db():
-    db.create_all()
-    print("Database created successfully.")
 
 
 def initialize_database(num_users=5, max_posts_per_user=6):
@@ -75,14 +62,40 @@ def initialize_database(num_users=5, max_posts_per_user=6):
                     db.session.add(post)
             db.session.commit()
 
-        # Наполнение базы данных тегами
-        # Выполняется внутри контекста, чтобы Flask знал, какое приложение будет использоваться
-        tags = ['Природа', 'Птицы', 'Животные']
-        for tag_name in tags:
-            if not Tag.query.filter_by(name=tag_name).first():
-                tag = Tag(name=tag_name)
-                db.session.add(tag)
-        db.session.commit()
+            # Наполнение базы данных тегами
+            # Выполняется внутри контекста, чтобы Flask знал, какое приложение будет использоваться
+            tags = fake.words(nb=7)
+            tag_objects = []
+            for tag_name in tags:
+                tag = Tag.query.filter_by(name=tag_name).first()
+                if not tag:
+                    tag = Tag(name=tag_name)
+                    db.session.add(tag)
+                tag_objects.append(tag)
+            db.session.commit()
+
+            # Назначение тегов постам
+            posts = Post.query.all()
+            for post in posts:
+                num_tags = fake.random_int(min=1, max=3)
+                random_tags = fake.random_elements(elements=tag_objects, length=num_tags, unique=True)
+                for tag in random_tags:
+                    post.tags.append(tag)
+            db.session.commit()
+
+
+# регистрирует функцию load_user как функцию, кот.будет исп-ся для загрузки user из бд по его id
+@login_manager.user_loader
+def load_user(user_id):
+    """ Функция, которая принимает id user-a и возвращает объект пользователя из базы данных"""
+    # return User.query.get(int(user_id))
+    return User.query.filter_by(id=user_id).first()
+
+
+@app.cli.command("create-db")
+def create_db():
+    db.create_all()
+    print("Database created successfully.")
 
 
 # Декоратор указывает, что функция index() будет вызываться,
@@ -295,8 +308,6 @@ def blog():
         posts = Post.query.filter_by(is_published=True).all()
 
     return render_template('blog.html', posts=posts)
-
-
 
 
 if __name__ == "__main__":
