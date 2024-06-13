@@ -6,7 +6,8 @@ from werkzeug.security import generate_password_hash, check_password_hash
 from flask_login import LoginManager, login_user, logout_user, login_required, current_user
 from forms import RegistrationForm, LoginForm, PostForm
 from models import db, User, Post, Tag
-from faker import Faker
+from fill_fakes import initialize_database
+
 
 # берем переменные окружения из файла
 env = dotenv_values(dotenv_path='.env')
@@ -42,47 +43,6 @@ def load_user(user_id):
 def create_db():
     db.create_all()
     print("Database created successfully.")
-
-
-def initialize_database(num_users=5, max_posts_per_user=6):
-    """Функция, с помощью которой проверяем состояние базы данных и при необходимости заполняем бд"""
-    with app.app_context():
-        user_count = User.query.count()
-        post_count = Post.query.count()
-        # проверяем наличие записей в базе данных
-        # если бд пустая, генерим данные
-        if user_count == 0 and post_count == 0:
-            fake = Faker('ru_RU')
-            for _ in range(num_users):
-                user = User(
-                    email=fake.email(),
-                    username=fake.user_name(),
-                    # password=generate_password_hash(fake.password())
-                    password=generate_password_hash('111')
-                )
-                # Сохраняем пользователя, чтобы получить user.id
-                db.session.add(user)
-                db.session.commit()
-
-                num_posts = fake.random_int(min=1, max=max_posts_per_user)
-                for _ in range(num_posts):
-                    post = Post(
-                        title=fake.sentence(),
-                        content=fake.text(),
-                        is_published=fake.boolean(chance_of_getting_true=70),
-                        user_id=user.id
-                    )
-                    db.session.add(post)
-            db.session.commit()
-
-        # Наполнение базы данных тегами
-        # Выполняется внутри контекста, чтобы Flask знал, какое приложение будет использоваться
-        tags = ['Природа', 'Птицы', 'Животные']
-        for tag_name in tags:
-            if not Tag.query.filter_by(name=tag_name).first():
-                tag = Tag(name=tag_name)
-                db.session.add(tag)
-        db.session.commit()
 
 
 # Декоратор указывает, что функция index() будет вызываться,
@@ -297,8 +257,7 @@ def blog():
     return render_template('blog.html', posts=posts)
 
 
-
-
 if __name__ == "__main__":
-    initialize_database()
+    with app.app_context():
+        initialize_database()
     app.run(debug=True)
