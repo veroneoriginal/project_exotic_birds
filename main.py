@@ -5,9 +5,8 @@ from flask_migrate import Migrate
 from werkzeug.security import generate_password_hash, check_password_hash
 from flask_login import LoginManager, login_user, logout_user, login_required, current_user
 from forms import RegistrationForm, LoginForm, PostForm
-from models import db, User, Post, Tag
+from models import db, User, Post, Tag, Comment
 from fill_fakes import initialize_database
-
 
 # берем переменные окружения из файла
 env = dotenv_values(dotenv_path='.env')
@@ -156,12 +155,10 @@ def create_post():
     return render_template('create_post.html', form=form)
 
 
-@app.route('/post/<int:post_id>')
+@app.route('/post/<int:post_id>', methods=['GET', 'POST'])
 def view_post(post_id):
-    # post_id создается в момент сохранения нового поста в базе данных
     post = Post.query.get_or_404(post_id)
 
-    # Проверка, опубликован ли пост и имеет ли пользователь доступ к нему
     if not post.is_published:
         if not current_user.is_authenticated:
             flash('Этого поста не существует.', 'warning')
@@ -170,10 +167,19 @@ def view_post(post_id):
             flash('Этого поста не существует.', 'warning')
             return redirect(url_for('personal_account'))
 
-    # Определение, является ли текущий пользователь автором поста
-    is_author = current_user.is_authenticated and post.user_id == current_user.id
+    if request.method == 'POST':
+        if current_user.is_authenticated:
+            content = request.form.get('content')
+            if content:
+                comment = Comment(content=content, user_id=current_user.id, post_id=post.id)
+                db.session.add(comment)
+                db.session.commit()
+                flash('Комментарий добавлен.', 'success')
+                return redirect(url_for('view_post', post_id=post.id))
+        else:
+            flash('Вам необходимо войти в систему, чтобы оставить комментарий.', 'warning')
 
-    # Возвращает отрендеренный HTML-шаблон view_post.html, передавая объект post в контексте
+    is_author = current_user.is_authenticated and current_user.id == post.user_id
     return render_template('view_post.html', post=post, is_author=is_author)
 
 

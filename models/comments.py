@@ -17,12 +17,11 @@ class Comment(db.Model):
 
     user = relationship('User', back_populates='comments')
     post = relationship('Post', back_populates='comments')
-    # replies устанавливает связь "один ко многим" между комментарием и его дочерними комментариями
-    replies = relationship('Comment', back_populates='parent_comment', remote_side=[id])
+    parent_comment = relationship('Comment', remote_side=[id], back_populates='replies')
+    replies = relationship('Comment', back_populates='parent_comment', cascade="all, delete-orphan")
 
 
 # избегаем циклического импорта
 User.comments = relationship('Comment', back_populates='user')
 Post.comments = relationship('Comment', back_populates='post')
-# parent_comment устанавливает обратную связь - каждый коммент может ссылаться на свой родительский коммент
-Comment.parent_comment = relationship('Comment', back_populates='replies', remote_side=[id])
+
