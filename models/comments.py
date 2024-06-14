@@ -17,6 +17,11 @@ class Comment(db.Model):
 
     user = relationship('User', back_populates='comments')
     post = relationship('Post', back_populates='comments')
+
+    # parent_comment — это отношение к другим объектам Comment (родительским комментариям)
+    # remote_side=[id] в родит.комментарии - удаленный (внешний) ключ для этой связи.
+    # т.е parent_comment указывает на родительский комментарий через его id.
+    # через replies устанавливается обратная связь с полем replies, кот.будет содержать список всех дочерних комментариев для данного комментария
     parent_comment = relationship('Comment', remote_side=[id], back_populates='replies')
     replies = relationship('Comment', back_populates='parent_comment', cascade="all, delete-orphan")
 
