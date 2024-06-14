@@ -171,7 +171,7 @@ def view_post(post_id):
         if current_user.is_authenticated:
             content = request.form.get('content')
             if content:
-                comment = Comment(content=content, user_id=current_user.id, post_id=post.id)
+                comment = Comment(content=content, user_id=current_user.id, post_id=post.id, notification=False)
                 db.session.add(comment)
                 db.session.commit()
                 flash('Комментарий добавлен.', 'success')
