@@ -16,20 +16,41 @@ services:
       timeout: 60s
       retries: 5
 
-#  dev-backend:
-#    env_file:
-#      - .env
-#    build: .
-#    ports:
-#      - "5000:5000"
-#    depends_on:
-#      pg:
-#        condition: service_healthy
-#    command: bash -c "
-#      python main.py
-#      "
-#    networks:
-#      - backend
+
+  gunicorn-backend:
+    env_file:
+      - .env
+    build: .
+    ports:
+      - "8000:8000"
+    depends_on:
+      pg:
+        condition: service_healthy
+    command: bash -c "
+      flask db upgrade
+      && pip install gunicorn
+      && gunicorn wsgi:app -b 0.0.0.0
+      "
+    networks:
+      - backend
+
+  prod-backend:
+    env_file:
+      - .env
+    build: .
+    ports:
+      - "9000:80"
+    depends_on:
+      pg:
+        condition: service_healthy
+    command: bash -c "
+      flask db upgrade && 
+      flask run --host=0.0.0.0 --port=80
+      "
+    networks:
+      - backend
+#    environment:
+#      FLASK_APP: main.py
 
 networks:
   backend:
