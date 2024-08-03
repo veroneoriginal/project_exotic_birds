@@ -7,6 +7,8 @@ from .post_and_tags import Post
 
 
 class Comment(db.Model):
+    """Таблица с комментариями связана с пользователями и с постами """
+
     __tablename__ = 'comments'
     id: Mapped[int] = mapped_column(Integer, primary_key=True)
     content: Mapped[str] = mapped_column(String, nullable=False)

@@ -36,8 +36,8 @@ def initialize_database(num_users=5, max_posts_per_user=6):
                 db.session.add(post)
         db.session.commit()
 
-        # Наполнение базы данных тегами
-        # Выполняется внутри контекста, чтобы Flask знал, какое приложение будет использоваться
+        # Наполнение базы данных тегами выполняется внутри контекста,
+        # чтобы Flask знал, какое приложение будет использоваться
         tags = [fake.unique.word() for _ in range(7)]
         tag_objects = [Tag(name=tag_name) for tag_name in tags]
 
